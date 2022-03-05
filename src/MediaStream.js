@@ -1,6 +1,6 @@
 
 import { NativeModules, DeviceEventEmitter } from 'react-native';
-import { defineCustomEventTarget } from 'event-target-shim';
+import { EventTarget } from 'event-target-shim';
 import { uniqueID } from './RTCUtil';
 
 import MediaStreamTrack from './MediaStreamTrack';
@@ -10,10 +10,15 @@ const { WebRTCModule } = NativeModules;
 
 const MEDIA_STREAM_EVENTS = ['active', 'inactive', 'addtrack', 'removetrack'];
 
-export default class MediaStream extends defineCustomEventTarget(...MEDIA_STREAM_EVENTS) {
+export default class MediaStream extends EventTarget(MEDIA_STREAM_EVENTS) {
     id: string;
     active: boolean = true;
 
+    onactive: ?Function;
+    oninactive: ?Function;
+    onaddtrack: ?Function;
+    onremovetrack: ?Function;
+  
     _tracks: Array<MediaStreamTrack> = [];
 
     /**

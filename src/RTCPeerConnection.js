@@ -1,5 +1,5 @@
 
-import { defineCustomEventTarget } from 'event-target-shim';
+import { EventTarget } from 'event-target-shim';
 import { NativeModules } from 'react-native';
 
 import MediaStream from './MediaStream';
@@ -57,7 +57,7 @@ const PEER_CONNECTION_EVENTS = [
 
 let nextPeerConnectionId = 0;
 
-export default class RTCPeerConnection extends defineCustomEventTarget(...PEER_CONNECTION_EVENTS) {
+export default class RTCPeerConnection extends EventTarget(PEER_CONNECTION_EVENTS) {
     localDescription: RTCSessionDescription;
     remoteDescription: RTCSessionDescription;
 
@@ -65,6 +65,17 @@ export default class RTCPeerConnection extends defineCustomEventTarget(...PEER_C
     iceGatheringState: RTCIceGatheringState = 'new';
     connectionState: RTCPeerConnectionState = 'new';
     iceConnectionState: RTCIceConnectionState = 'new';
+
+    onconnectionstatechange: ?Function;
+    onicecandidate: ?Function;
+    onicecandidateerror: ?Function;
+    oniceconnectionstatechange: ?Function;
+    onicegatheringstatechange: ?Function;
+    onnegotiationneeded: ?Function;
+    onsignalingstatechange: ?Function;
+  
+    onaddstream: ?Function;
+    onremovestream: ?Function;
 
     _peerConnectionId: number;
     _localStreams: Array<MediaStream> = [];
@@ -129,7 +140,7 @@ export default class RTCPeerConnection extends defineCustomEventTarget(...PEER_C
                 (successful, data) => {
                     if (successful) {
                         this._mergeState(data.state);
-                        resolve(data);
+                        resolve(data.session);
                     } else {
                         reject(data); // TODO: convert to NavigatorUserMediaError
                     }
@@ -146,7 +157,7 @@ export default class RTCPeerConnection extends defineCustomEventTarget(...PEER_C
                 (successful, data) => {
                     if (successful) {
                         this._mergeState(data.state);
-                        resolve(data);
+                        resolve(data.session);
                     } else {
                         reject(data);
                     }
@@ -160,6 +171,8 @@ export default class RTCPeerConnection extends defineCustomEventTarget(...PEER_C
     }
 
     async setLocalDescription(sessionDescription: ?RTCSessionDescription) {
+        console.log(sessionDescription)
+        
         const desc = sessionDescription
             ? sessionDescription.toJSON
                 ? sessionDescription.toJSON()

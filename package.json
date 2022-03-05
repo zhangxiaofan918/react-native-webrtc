@@ -19,7 +19,7 @@
   "main": "src/index.js",
   "dependencies": {
     "base64-js": "1.5.1",
-    "event-target-shim": "6.0.2",
+    "event-target-shim": "^5.0.0",
     "tar": "6.1.11"
   },
   "peerDependencies": {

@@ -1,6 +1,6 @@
 
 import { NativeModules } from 'react-native';
-import { defineCustomEventTarget } from 'event-target-shim';
+import EventTarget from 'event-target-shim';
 
 import { deepClone } from './RTCUtil';
 
@@ -10,7 +10,7 @@ const MEDIA_STREAM_TRACK_EVENTS = ['ended', 'mute', 'unmute'];
 
 type MediaStreamTrackState = 'live' | 'ended';
 
-class MediaStreamTrack extends defineCustomEventTarget(...MEDIA_STREAM_TRACK_EVENTS) {
+class MediaStreamTrack extends EventTarget(MEDIA_STREAM_TRACK_EVENTS) {
     _constraints: Object;
     _enabled: boolean;
     _settings: Object;
@@ -23,6 +23,11 @@ class MediaStreamTrack extends defineCustomEventTarget(...MEDIA_STREAM_TRACK_EVE
     readyState: MediaStreamTrackState;
     remote: boolean;
 
+    onended: ?Function;
+    onmute: ?Function;
+    onunmute: ?Function;
+    overconstrained: ?Function;
+  
     constructor(info) {
         super();
 
