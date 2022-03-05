@@ -424,10 +424,8 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
         PeerConnection.RTCConfiguration rtcConfiguration = parseRTCConfiguration(configuration);
 
         try {
-            ThreadUtils.runOnExecutor(() -> peerConnectionInitAsync(rtcConfiguration, id));
-
             ThreadUtils.submitToExecutor(() -> {
-                PeerConnectionObserver observer = new PeerConnectionObserver(this, id);
+                PeerConnectionObserver observer = new PeerConnectionObserver(this, id, rtcConfiguration.sdpSemantics == PeerConnection.SdpSemantics.UNIFIED_PLAN);
                 PeerConnection peerConnection = mFactory.createPeerConnection(rtcConfiguration, observer);
                 observer.setPeerConnection(peerConnection);
                 mPeerConnectionObservers.put(id, observer);
@@ -436,17 +434,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-    private void peerConnectionInitAsync(
-            PeerConnection.RTCConfiguration configuration,
-            int id) {
-        PeerConnectionObserver observer = new PeerConnectionObserver(this,
-                id, configuration.sdpSemantics == PeerConnection.SdpSemantics.UNIFIED_PLAN);
-        PeerConnection peerConnection
-                = mFactory.createPeerConnection(configuration, observer);
-
-        observer.setPeerConnection(peerConnection);
-        mPeerConnectionObservers.put(id, observer);
     }
 
     MediaStream getStreamForReactTag(String streamReactTag) {
@@ -788,6 +775,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     public void peerConnectionSetLocalDescription(int pcId,
                                                   ReadableMap desc,
                                                   Promise promise) {
+        Log.d(TAG, "setLocalDescription: " + desc);
         ThreadUtils.runOnExecutor(() -> {
             PeerConnection peerConnection = getPeerConnection(pcId);
             if (peerConnection == null) {
@@ -807,7 +795,7 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                     WritableMap newSdpMap = Arguments.createMap();
                     newSdpMap.putString("type", newSdp.type.canonicalForm());
                     newSdpMap.putString("sdp", newSdp.description);
-                    newSdpMap.putMap("state", serializeState(id));
+                    newSdpMap.putMap("state", serializeState(pcId));
                     promise.resolve(newSdpMap);
                 }
 
@@ -839,7 +827,6 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
                                                    int id,
                                                    Callback callback) {
         ThreadUtils.runOnExecutor(() -> {
-            peerConnectionAddICECandidateAsync(candidateMap, id, callback);
             PeerConnection peerConnection = getPeerConnection(id);
             if (peerConnection == null) {
                 Log.d(TAG, "peerConnectionSetRemoteDescription() peerConnection is null");
