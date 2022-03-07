@@ -1,6 +1,6 @@
 
 import { NativeModules } from 'react-native';
-import EventTarget from 'event-target-shim';
+import { EventTarget } from 'event-target-shim';
 
 import { deepClone } from './RTCUtil';
 
