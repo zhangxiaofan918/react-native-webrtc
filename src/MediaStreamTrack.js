@@ -102,6 +102,9 @@ class MediaStreamTrack extends EventTarget(MEDIA_STREAM_TRACK_EVENTS) {
     }
 
     release() {
+        console.trace("Releasing track.");
+        let e = new Error();
+        console.log(e.stack);
         WebRTCModule.mediaStreamTrackRelease(this.id);
     }
 }

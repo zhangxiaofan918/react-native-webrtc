@@ -138,6 +138,9 @@ export default class MediaStream extends EventTarget(MEDIA_STREAM_EVENTS) {
             }
         }
 
+        console.trace("Releasing stream.");
+        let e = new Error();
+        console.log(e.stack);
         WebRTCModule.mediaStreamRelease(this._reactTag);
     }
 }

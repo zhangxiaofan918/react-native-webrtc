@@ -18,6 +18,7 @@ import com.facebook.react.bridge.UiThreadUtil;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 
+import java.lang.Exception;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -456,6 +457,7 @@ class GetUserMediaImpl {
                     surfaceTextureHelper.dispose();
                 }
                 
+                Log.v(TAG, "Disposing track.", new Exception());
                 mediaSource.dispose();
                 track.dispose();
                 disposed = true;
