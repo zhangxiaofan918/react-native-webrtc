@@ -227,7 +227,7 @@ public class WebRTCView extends ViewGroup {
             // window. Additionally, a memory leak was solved in a similar way
             // on iOS.
             
-            ();
+            removeRendererFromVideoTrack();
         } finally {
             super.onDetachedFromWindow();
         }
