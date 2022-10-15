@@ -586,15 +586,19 @@ public class WebRTCModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void mediaStreamTrackSetEnabled(String id, boolean enabled) {
         ThreadUtils.runOnExecutor(() -> {
-            MediaStreamTrack track = getTrack(id);
-            if (track == null) {
-                Log.d(TAG, "mediaStreamTrackSetEnabled() track is null");
-                return;
-            } else if (track.enabled() == enabled) {
-                return;
+            try{
+                MediaStreamTrack track = getTrack(id);
+                if (track == null) {
+                    Log.d(TAG, "mediaStreamTrackSetEnabled() track is null");
+                    return;
+                } else if (track.enabled() == enabled) {
+                    return;
+                }
+                track.setEnabled(enabled);
+                getUserMediaImpl.mediaStreamTrackSetEnabled(id, enabled);
+            } catch (Exception e){
+                e.printStackTrace();
             }
-            track.setEnabled(enabled);
-            getUserMediaImpl.mediaStreamTrackSetEnabled(id, enabled);
         });
     }
 
